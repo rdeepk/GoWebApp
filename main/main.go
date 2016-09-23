@@ -15,8 +15,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content Type", "text/html")
 	tmpl, err := template.New("test").Parse(doc)
 	if err == nil {
-		context := Context{"the message"}
-		tmpl.Execute(w, context)
+		//context := Context{"the message"}
+		tmpl.Execute(w, r.URL.Path)
 	}
 }
 
@@ -25,11 +25,15 @@ const doc = `
 		<html>
 			<head><title>Go Web App</title></head>
 			<body>
-				<h1>Hello {{.Message}}</h1>
+			{{if eq . "/Google"}}
+				<h1>Hey, Google made Go!</h1>
+			{{else}}
+				<h1>Hello {{.}}</h1>
+			{{end}}
 			</body>
 		</html>
 `
 
-type Context struct {
+/*type Context struct {
 	Message string
-}
+}*/
