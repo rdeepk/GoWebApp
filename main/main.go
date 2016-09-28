@@ -1,41 +1,48 @@
 package main
 
 import (
-	//"fmt"
 	"net/http"
 	"text/template"
 )
 
 func main() {
 	http.HandleFunc("/", home)
-	http.ListenAndServe(":9000", nil)
+	http.ListenAndServe(":8000", nil)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content Type", "text/html")
-	tmpl, err := template.New("test").Parse(doc)
-	if err == nil {
-		context := Context{
-			[3]string{"Apple", "Mango", "Banana"},
-			"Go Web App",
-		}
-		tmpl.Execute(w, context)
+	templates := template.New("template")
+	templates.New("test").Parse(doc)
+	templates.New("header").Parse(header)
+	templates.New("footer").Parse(footer)
+	context := Context{
+		[3]string{"Lemon", "Orange", "Apple"},
+		"Go Webb APP",
 	}
+	templates.Lookup("test").Execute(w, context)
 }
 
 const doc = `
+{{template "header" .Title}}
+  <body>
+    <h1>List of Fruit</h1>
+    <ul>
+      {{range .Fruit}}
+      	<li>{{.}}</li>
+      {{end}}
+    </ul>
+  </body>
+{{template "footer"}}
+`
+
+const header = `
 	<!DOCTYPE html>
 		<html>
-			<head><title>{{.Title}}</title></head>
-			<body>
-				<h1>List of fruits</h1>
-				<ul>
-				{{range .Fruit}}
-					<li>{{.}}</li>
-				{{end}}
-				</ul>
-			</body>
-		</html>
+			<head><title>{{.}}</title></head>
+`
+const footer = `
+</html>
 `
 
 type Context struct {
