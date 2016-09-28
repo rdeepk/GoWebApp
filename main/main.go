@@ -1,51 +1,68 @@
 package main
 
 import (
+	"bufio"
 	"net/http"
+	"os"
+	"strings"
 	"text/template"
 )
 
 func main() {
 	http.HandleFunc("/", home)
+	http.HandleFunc("/img/", serveResource)
+	http.HandleFunc("/css/", serveResource)
 	http.ListenAndServe(":8000", nil)
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content Type", "text/html")
-	templates := template.New("template")
-	templates.New("test").Parse(doc)
-	templates.New("header").Parse(header)
-	templates.New("footer").Parse(footer)
-	context := Context{
-		[3]string{"Lemon", "Orange", "Apple"},
-		"Go Webb APP",
+	//w.Header().Add("Content Type", "text/html")
+	templates := populateTemplates()
+	requestedFile := r.URL.Path[1:]
+	template := templates.Lookup(requestedFile + ".html")
+	if template != nil {
+		template.Execute(w, nil)
+	} else {
+		w.WriteHeader(404)
 	}
-	templates.Lookup("test").Execute(w, context)
 }
 
-const doc = `
-{{template "header" .Title}}
-  <body>
-    <h1>List of Fruit</h1>
-    <ul>
-      {{range .Fruit}}
-      	<li>{{.}}</li>
-      {{end}}
-    </ul>
-  </body>
-{{template "footer"}}
-`
+func serveResource(w http.ResponseWriter, r *http.Request) {
+	path := "public" + r.URL.Path
+	var contentType string
+	if strings.HasSuffix(path, ".css") {
+		contentType = "text/css"
+	} else if strings.HasSuffix(path, ".png") {
+		contentType = "image/png"
+	} else {
+		contentType = "text/plain"
+	}
 
-const header = `
-	<!DOCTYPE html>
-		<html>
-			<head><title>{{.}}</title></head>
-`
-const footer = `
-</html>
-`
+	f, err := os.Open(path)
 
-type Context struct {
-	Fruit [3]string
-	Title string
+	if err == nil {
+		defer f.Close()
+		w.Header().Add("Content-Type", contentType)
+		br := bufio.NewReader(f)
+		br.WriteTo(w)
+	} else {
+		w.WriteHeader(404)
+	}
+}
+
+func populateTemplates() *template.Template {
+	result := template.New("template")
+	basePath := "templates"
+	templateFolder, _ := os.Open(basePath)
+	defer templateFolder.Close()
+
+	templatePathsRaw, _ := templateFolder.Readdir(-1)
+	templatePaths := new([]string)
+	for _, pathInfo := range templatePathsRaw {
+		if !pathInfo.IsDir() {
+			*templatePaths = append(*templatePaths, basePath+"/"+pathInfo.Name())
+		}
+	}
+	result.ParseFiles(*templatePaths...)
+	return result
 }
