@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"github.com/rdeepk/GoWebApp/viewmodels"
 	"net/http"
 	"os"
 	"strings"
@@ -19,9 +20,19 @@ func home(w http.ResponseWriter, r *http.Request) {
 	//w.Header().Add("Content Type", "text/html")
 	templates := populateTemplates()
 	requestedFile := r.URL.Path[1:]
+	var context interface{} = nil
+	switch requestedFile {
+	case "home":
+		context = viewmodels.GetHome()
+	case "categories":
+		context = viewmodels.GetCategories()
+
+		//case "products":
+		//context = viewmodels.GetProducts()
+	}
 	template := templates.Lookup(requestedFile + ".html")
 	if template != nil {
-		template.Execute(w, nil)
+		template.Execute(w, context)
 	} else {
 		w.WriteHeader(404)
 	}
