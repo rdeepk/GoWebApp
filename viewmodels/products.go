@@ -26,11 +26,20 @@ type ProductVM struct {
 	Product Product
 }
 
-func GetProduct() ProductVM {
+func GetProduct(id int) ProductVM {
 	var result ProductVM
+	var product Product
+	productList := getProductList()
+	for _, p := range productList {
+		if id == p.Id {
+			product = p
+			break
+		}
+	}
+
 	result.Active = "shop"
-	result.Title = "Lemonade Stand Society - Lemon Juice"
-	result.Product = MakeLemonJuiceProduct()
+	result.Title = "Lemonade Stand Society - " + product.Name
+	result.Product = product
 	return result
 }
 
@@ -52,29 +61,34 @@ func GetProducts(id int) Products {
 	result.Title = "Lemonade Stand Society - " + shopName + "shop"
 
 	if id == 1 {
-		lemonJuice := MakeLemonJuiceProduct()
-		appleJuice := MakeAppleJuiceProduct()
-		watermelonJuice := MakeWatermelonJuiceProduct()
-		kiwiJuice := MakeKiwiJuiceProduct()
-		mangosteenJuice := MakeMangosteenJuiceProduct()
-		orangeJuice := MakeOrangeJuiceProduct()
-		pineappleJuice := MakePineappleJuiceProduct()
-		strawberryJuice := MakeStrawberryJuiceProduct()
-
-		result.Products = []Product{
-			lemonJuice,
-			appleJuice,
-			watermelonJuice,
-			kiwiJuice,
-			mangosteenJuice,
-			orangeJuice,
-			pineappleJuice,
-			strawberryJuice,
-		}
+		result.Products = getProductList()
 	}
 
 	return result
 
+}
+
+func getProductList() []Product {
+	lemonJuice := MakeLemonJuiceProduct()
+	appleJuice := MakeAppleJuiceProduct()
+	watermelonJuice := MakeWatermelonJuiceProduct()
+	kiwiJuice := MakeKiwiJuiceProduct()
+	mangosteenJuice := MakeMangosteenJuiceProduct()
+	orangeJuice := MakeOrangeJuiceProduct()
+	pineappleJuice := MakePineappleJuiceProduct()
+	strawberryJuice := MakeStrawberryJuiceProduct()
+
+	result := []Product{
+		lemonJuice,
+		appleJuice,
+		watermelonJuice,
+		kiwiJuice,
+		mangosteenJuice,
+		orangeJuice,
+		pineappleJuice,
+		strawberryJuice,
+	}
+	return result
 }
 
 func MakeLemonJuiceProduct() Product {

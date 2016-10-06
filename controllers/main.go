@@ -11,17 +11,24 @@ import (
 
 func Register(templates *template.Template) {
 	router := mux.NewRouter()
+
 	hc := new(homeController)
 	hc.template = templates.Lookup("home.html")
 	router.HandleFunc("/home", hc.get)
+
 	cc := new(categoriesController)
 	cc.template = templates.Lookup("categories.html")
 	router.HandleFunc("/categories", cc.get)
+
 	categoryController := new(categoryController)
 	categoryController.template = templates.Lookup("products.html")
 	router.HandleFunc("/categories/{id}", categoryController.get)
-	http.Handle("/", router)
 
+	productController := new(productController)
+	productController.template = templates.Lookup("product.html")
+	router.HandleFunc("/products/{id}", productController.get)
+
+	http.Handle("/", router)
 	http.HandleFunc("/img/", serveResource)
 	http.HandleFunc("/css/", serveResource)
 }
