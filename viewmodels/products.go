@@ -34,30 +34,43 @@ func GetProduct() ProductVM {
 	return result
 }
 
-func GetProducts() Products {
+func GetProducts(id int) Products {
+	var shopName string
 	result := Products{
-		Title:  "Lemonade Stand Society - Juice Shop",
 		Active: "shop",
 	}
 
-	lemonJuice := MakeLemonJuiceProduct()
-	appleJuice := MakeAppleJuiceProduct()
-	watermelonJuice := MakeWatermelonJuiceProduct()
-	kiwiJuice := MakeKiwiJuiceProduct()
-	mangosteenJuice := MakeMangosteenJuiceProduct()
-	orangeJuice := MakeOrangeJuiceProduct()
-	pineappleJuice := MakePineappleJuiceProduct()
-	strawberryJuice := MakeStrawberryJuiceProduct()
+	switch id {
+	case 1:
+		shopName = "Juice"
+	case 2:
+		shopName = "Supply"
+	case 3:
+		shopName = "Advertising"
+	}
 
-	result.Products = []Product{
-		lemonJuice,
-		appleJuice,
-		watermelonJuice,
-		kiwiJuice,
-		mangosteenJuice,
-		orangeJuice,
-		pineappleJuice,
-		strawberryJuice,
+	result.Title = "Lemonade Stand Society - " + shopName + "shop"
+
+	if id == 1 {
+		lemonJuice := MakeLemonJuiceProduct()
+		appleJuice := MakeAppleJuiceProduct()
+		watermelonJuice := MakeWatermelonJuiceProduct()
+		kiwiJuice := MakeKiwiJuiceProduct()
+		mangosteenJuice := MakeMangosteenJuiceProduct()
+		orangeJuice := MakeOrangeJuiceProduct()
+		pineappleJuice := MakePineappleJuiceProduct()
+		strawberryJuice := MakeStrawberryJuiceProduct()
+
+		result.Products = []Product{
+			lemonJuice,
+			appleJuice,
+			watermelonJuice,
+			kiwiJuice,
+			mangosteenJuice,
+			orangeJuice,
+			pineappleJuice,
+			strawberryJuice,
+		}
 	}
 
 	return result

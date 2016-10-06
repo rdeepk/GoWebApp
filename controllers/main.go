@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"bufio"
-	"github.com/rdeepk/GoWebApp/viewmodels"
+	"github.com/gorilla/mux"
 	"net/http"
 	"os"
 	"strings"
@@ -10,27 +10,18 @@ import (
 )
 
 func Register(templates *template.Template) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		requestedFile := r.URL.Path[1:]
-		var context interface{} = nil
-		switch requestedFile {
-		case "home":
-			context = viewmodels.GetHome()
-		case "categories":
-			context = viewmodels.GetCategories()
-		case "products":
-			context = viewmodels.GetProducts()
-		case "product":
-			context = viewmodels.GetProduct()
-		}
+	router := mux.NewRouter()
+	hc := new(homeController)
+	hc.template = templates.Lookup("home.html")
+	router.HandleFunc("/home", hc.get)
+	cc := new(categoriesController)
+	cc.template = templates.Lookup("categories.html")
+	router.HandleFunc("/categories", cc.get)
+	categoryController := new(categoryController)
+	categoryController.template = templates.Lookup("products.html")
+	router.HandleFunc("/categories/{id}", categoryController.get)
+	http.Handle("/", router)
 
-		template := templates.Lookup(requestedFile + ".html")
-		if template != nil {
-			template.Execute(w, context)
-		} else {
-			w.WriteHeader(404)
-		}
-	})
 	http.HandleFunc("/img/", serveResource)
 	http.HandleFunc("/css/", serveResource)
 }
