@@ -8,7 +8,8 @@ import (
 )
 
 type homeController struct {
-	template *template.Template
+	template      *template.Template
+	loginTemplate *template.Template
 }
 
 func (this *homeController) get(w http.ResponseWriter, r *http.Request) {
@@ -17,4 +18,13 @@ func (this *homeController) get(w http.ResponseWriter, r *http.Request) {
 	responseWriter := util.GetResponseWriter(w, r)
 	defer responseWriter.Close()
 	this.template.Execute(responseWriter, vm)
+}
+
+func (this *homeController) login(w http.ResponseWriter, r *http.Request) {
+	responseWriter := util.GetResponseWriter(w, r)
+	defer responseWriter.Close()
+
+	vm := viewmodels.GetLogin()
+	w.Header().Add("Content-Type", "text/html")
+	this.loginTemplate.Execute(responseWriter, vm)
 }
